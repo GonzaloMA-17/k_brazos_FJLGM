@@ -1,2 +1,15 @@
-# k_brazos_FJLGM
-Repositorio para la práctica de Extensiones de Machine Learning, sobre el bandido de k brazos en el contexto del Reinforcement Learning.
+# Título del Trabajo 
+## Información
+- **Alumnos:** López, Francisco José; Marcos, Gonzalo; 
+- **Asignatura:** Extensiones de Machine Learning
+- **Curso:** 2024/2025
+- **Grupo:** FJLGM
+
+## Descripción 
+[Breve descripción del trabajo y sus objetivos] 
+## Estructura 
+[Explicación de la organización del repositorio] 
+## Instalación y Uso 
+[Instrucciones si son necesarias] 
+## Tecnologías Utilizadas 
+[Lista de lenguajes, frameworks, etc.]
