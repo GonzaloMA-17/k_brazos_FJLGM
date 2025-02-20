@@ -50,7 +50,9 @@ def plot_average_rewards(steps: int, rewards: np.ndarray, algorithms: List[Algor
     plt.show()
 
 
-def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, algorithms: List[Algorithm]):
+def plot_optimal_selections(steps: int, 
+                            optimal_selections: np.ndarray, 
+                            algorithms: List[Algorithm]):
     """
     Genera la gráfica de Porcentaje de Selección del Brazo Óptimo vs Pasos de Tiempo.
 
@@ -58,5 +60,86 @@ def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, algorith
     :param optimal_selections: Matriz de porcentaje de selecciones óptimas.
     :param algorithms: Lista de instancias de algoritmos comparados.
     """
+    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+
+    plt.figure(figsize=(14, 7))
+    for idx, algo in enumerate(algorithms):
+        label = get_algorithm_label(algo)
+        plt.plot(range(steps), optimal_selections[idx], label=label, linewidth=2)
+
+    plt.xlabel('Pasos de Tiempo', fontsize=14)
+    plt.ylabel('Porcentaje de Selección del Brazo Óptimo', fontsize=14)
+    plt.title('Porcentaje de Selección del Brazo Óptimo vs Pasos de Tiempo', fontsize=16)
+    plt.legend(title='Algoritmos')
+    plt.tight_layout()
+    plt.show()
+
+# def plot_arm_statistics(arm_stats: LoQueConsideres,
+#                             algorithms: List[Algorithm], *args):
+#     """
+#     Genera gráficas separadas de Selección de Arms:
+#     Ganancias vs Pérdidas para cada algoritmo.
+#     - :param arm_stats: Lista (de diccionarios) con estadísticas de cada brazo por algoritmo.
+#     - :param algorithms: Lista de instancias de algoritmos comparados.
+#     - :param args: Opcional. Parámetros que consideres
+#     """
+
+def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], optimal_arm: int):
+    """
+    Genera gráficas separadas de Selección de Arms:
+    Ganancias vs Pérdidas para cada algoritmo.
+
+    :param arm_stats: Lista (de diccionarios) con estadísticas de cada brazo por algoritmo.
+                      Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
+    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param optimal_arm: Índice del brazo óptimo.
+
+    ADICIONAL:
+    Para generar las estadísticas de cada brazo (arm_stats), puedes considerar varias métricas que te ayudarán a entender el rendimiento de cada brazo. Aquí hay algunos ejemplos de estadísticas que puedes usar:
+
+    - Promedio de Ganancias (average_rewards): El promedio de las recompensas obtenidas por cada brazo.
+    - Número de Selecciones (selection_counts): El número de veces que cada brazo fue seleccionado.
+    - Varianza de las Ganancias (variance_rewards): La varianza de las recompensas obtenidas por cada brazo (opcional).
+    - Recompensa Total (total_rewards): La suma de todas las recompensas obtenidas por cada brazo (opcional).
+    """
+    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+
+    num_algorithms = len(algorithms)
+    fig, axes = plt.subplots(num_algorithms, 1, figsize=(14, 7 * num_algorithms), sharex=True)
+
+    if num_algorithms == 1:
+        axes = [axes]
+
+    for idx, algo in enumerate(algorithms):
+        ax = axes[idx]
+        stats = arm_stats[idx]
+        average_rewards = stats['average_rewards']
+        selection_counts = stats['selection_counts']
+
+        bars = ax.bar(range(len(average_rewards)), average_rewards, tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)])
+        for i, bar in enumerate(bars):
+            if i == optimal_arm:
+                bar.set_color('g')
+            else:
+                bar.set_color('b')
+
+        ax.set_xlabel('Brazo (Número de Selecciones)', fontsize=14)
+        ax.set_ylabel('Promedio de Ganancias', fontsize=14)
+        ax.set_title(f'Estadísticas de Selección de Brazos para {get_algorithm_label(algo)}', fontsize=16)
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_regret(steps: int,
+                regret_accumulated: np.ndarray,
+                algorithms: List[Algorithm], *args):
+    """
+    Genera la gráfica de Regret Acumulado vs Pasos de Tiempo
+    - :param steps: Número de pasos de tiempo.
+    - :param regret_accumulated: Matriz de regret acumulado (algoritmos x pasos).
+    - :param algorithms: Lista de instancias de algoritmos comparados.
+    - :param args: Opcional. Parámetros que consideres. P.e. la cota teórica Cte * ln(T).
+    """
 
     raise NotImplementedError("Esta función aún no ha sido implementada.")
+
