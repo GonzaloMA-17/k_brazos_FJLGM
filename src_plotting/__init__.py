@@ -1,5 +1,5 @@
 # Importación de módulos o clases
-from .plotting import plot_average_rewards, plot_optimal_selections, plot_arm_statistics
+from .plotting import plot_average_rewards, plot_optimal_selections, plot_arm_statistics, calculate_expected_regret, plot_regret
 
 # Lista de módulos o clases públicas
-__all__ = ['plot_average_rewards', 'plot_optimal_selections', 'plot_arm_statistics']
+__all__ = ['plot_average_rewards', 'plot_optimal_selections', 'plot_arm_statistics', 'calculate_expected_regret', 'plot_regret']

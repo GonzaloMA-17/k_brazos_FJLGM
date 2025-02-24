@@ -172,16 +172,39 @@ def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], opti
     plt.tight_layout()
     plt.show()
 
-def plot_regret(steps: int,
-                regret_accumulated: np.ndarray,
-                algorithms: List[Algorithm], *args):
+def plot_regret(steps: int, regret_accumulated: np.ndarray, algorithms: List[Algorithm], expected_regret: np.ndarray = None):
     """
-    Genera la gráfica de Regret Acumulado vs Pasos de Tiempo
-    - :param steps: Número de pasos de tiempo.
-    - :param regret_accumulated: Matriz de regret acumulado (algoritmos x pasos).
-    - :param algorithms: Lista de instancias de algoritmos comparados.
-    - :param args: Opcional. Parámetros que consideres. P.e. la cota teórica Cte * ln(T).
+    Genera la gráfica de Regret Acumulado vs Pasos de Tiempo.
+
+    :param steps: Número de pasos de tiempo.
+    :param regret_accumulated: Matriz de regret acumulado (algoritmos x pasos).
+    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param expected_regret: (Opcional) Arreglo con el arrepentimiento esperado para cada paso de tiempo.
     """
+    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
 
-    raise NotImplementedError("Esta función aún no ha sido implementada.")
+    plt.figure(figsize=(14, 7))
+    for idx, algo in enumerate(algorithms):
+        label = get_algorithm_label(algo)
+        plt.plot(range(steps), regret_accumulated[idx], label=label, linewidth=2)
 
+    if expected_regret is not None:
+        plt.plot(range(steps), expected_regret, label='Arrepentimiento Esperado', linestyle='--', color='r', linewidth=2)
+
+    plt.xlabel('Pasos de Tiempo', fontsize=14)
+    plt.ylabel('Rechazo Acumulado', fontsize=14)
+    plt.title('Rechazo Acumulado vs Pasos de Tiempo', fontsize=16)
+    plt.legend(title='Algoritmos')
+    plt.tight_layout()
+    plt.show()
+
+
+def calculate_expected_regret(steps: int, constant: float) -> np.ndarray:
+    """
+    Calcula el arrepentimiento esperado utilizando la fórmula C * ln(T).
+
+    :param steps: Número de pasos de tiempo.
+    :param constant: Constante C utilizada en la fórmula.
+    :return: Arreglo con el arrepentimiento esperado para cada paso de tiempo.
+    """
+    return constant * np.log(np.arange(1, steps + 1))
