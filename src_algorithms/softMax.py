@@ -2,9 +2,9 @@
 Module: algorithms/softmax.py
 Description: Implementación del algoritmo softmax para el problema de los k-brazos.
 
-Author: Luis Daniel Hernández Molinero
-Email: ldaniel@um.es
-Date: 2025/01/29
+Authors: Gonzalo Marcos Andres and Francisco José López Fernández
+Email: gonzalo.marcosa@um.es and franciscojose.lopezf@um.es
+Date: 2025/02/25
 
 This software is licensed under the GNU General Public License v3.0 (GPL-3.0),
 with the additional restriction that it may not be used for commercial purposes.
@@ -15,6 +15,7 @@ For more details about GPL-3.0: https://www.gnu.org/licenses/gpl-3.0.html
 import numpy as np
 from src_algorithms.algorithm import Algorithm
 class Softmax(Algorithm):
+    
     def __init__(self, k: int, tau: float = 1.0):
         """
         Inicializa el algoritmo softmax.
@@ -44,10 +45,15 @@ class Softmax(Algorithm):
 
         :return: índice del brazo seleccionado.
         """
-        # Calcula los exponentes de las estimaciones ajustadas por la temperatura
-        exp_estimates = np.exp(self.values / self.tau)
-        # Normaliza para obtener una distribución de probabilidad
-        probabilities = exp_estimates / np.sum(exp_estimates)
-        # Selecciona un brazo aleatoriamente según la distribución calculada
-        chosen_arm = np.random.choice(self.k, p=probabilities)
+        
+        "Numerador: exponencial de la estimacion de la recompensa de cada brazo dividida por tau"
+        expon = np.exp(self.values / self.tau)
+
+        "Denominador: sumatorio de la exponencial de la estimacion de la recompensa de cada brazo dividida por tau"
+        sum_expon = np.sum(expon)
+        
+        "Probabilidad de seleccionar cada brazo calculada con la formula softmax"
+        probab = expon / sum_expon 
+        
+        chosen_arm = np.random.choice(self.k, p=probab)
         return chosen_arm

@@ -21,12 +21,12 @@ class ArmBinomial(Arm):
 
         """
         Genera una recompensa siguiendo una distribución Binomial.
-        
+
         :return: Recompensa obtenida del brazo.
         """
         reward = np.random.binomial(self.n, self.p)
-        return reward 
-    
+        return reward
+
     def get_expected_value(self) -> float:
         """
         Devuelve el valor esperado de la distribución Binomial.
@@ -36,7 +36,7 @@ class ArmBinomial(Arm):
         :return: Valor esperado de la distribución.
         """
         return self.n * self.p
-    
+
     def __str__(self):
         """
         Representación en cadena del brazo Binomial.
@@ -44,7 +44,7 @@ class ArmBinomial(Arm):
         :return: Descripción detallada del brazo Binomial.
         """
         return f"ArmBinomial(n={self.n}, p={self.p})"
-    
+
     @classmethod
     def generate_arms(cls, k: int, n_min: int = 2, n_max: int = 20, p_min: float = 0.1, p_max: float = 0.9):
         """
@@ -58,21 +58,24 @@ class ArmBinomial(Arm):
         :return: Lista de brazos generados.
         """
         "Normas:"
-        
+
         assert k > 0, "El número de brazos k debe ser mayor que 0."
         assert n_min < n_max, "n_min debe ser menor que n_max."
-        assert 0 <= p_min < p_max <= 1, "p_min y p_max deben estar en el rango [0, 1] con p_min < p_max."
+        assert p_min < p_max , "p_min debe ser menor que p_max"
 
-        p_values = set()
-        n_values = set()
+        arms = []
 
-        while len(p_values) < k:
+        while len(arms) < k:
             p = round(np.random.uniform(p_min, p_max), 2)
-            n = np.random.randint(n_min, n_max + 1)
-            p_values.add(p)
-            n_values.add(n)
-
-        arms = [ArmBinomial(n, p) for n, p in zip(n_values, p_values)]
+            n = round(np.random.randint(n_min, n_max + 1),2)
+            arm = ArmBinomial(n, p)
+            
+            """ 
+            Se pueden generar brazos repetidos, lo que hace que no se incluyan en la lista y no se genern k brazos.
+            Por lo que se añade la siguiente condición para que se añadan a la lista de brazos generados.
+            """
+            if arm not in arms: 
+                arms.append(arm) 
 
         # arms = []
         # for _ in range(k):

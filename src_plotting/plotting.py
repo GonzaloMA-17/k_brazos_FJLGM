@@ -1,10 +1,25 @@
+"""
+Module: scr_plotting/plotting.py
+Description: Desarrollo de gráficas y estadísticas para el problema de los k-brazos.
+
+Authors: Gonzalo Marcos Andres and Francisco José López Fernández
+Email: gonzalo.marcosa@um.es and franciscojose.lopezf@um.es
+Date: 2025/02/25
+
+This software is licensed under the GNU General Public License v3.0 (GPL-3.0),
+with the additional restriction that it may not be used for commercial purposes.
+
+For more details about GPL-3.0: https://www.gnu.org/licenses/gpl-3.0.html
+"""
+
+
 from typing import List
 
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from src_algorithms import Algorithm, EpsilonGreedy
+from src_algorithms import *
 
 
 def get_algorithm_label(algo: Algorithm) -> str:
@@ -19,13 +34,15 @@ def get_algorithm_label(algo: Algorithm) -> str:
     label = type(algo).__name__
     if isinstance(algo, EpsilonGreedy):
         label += f" (epsilon={algo.epsilon})"
+    elif isinstance(algo, Softmax):
+        label += f" (tau={algo.tau})"
+        
     # elif isinstance(algo, OtroAlgoritmo):
     #     label += f" (parametro={algo.parametro})"
     # Añadir más condiciones para otros algoritmos aquí
     else:
         raise ValueError("El algoritmo debe ser de la clase Algorithm o una subclase.")
     return label
-
 
 def plot_average_rewards(steps: int, rewards: np.ndarray, algorithms: List[Algorithm]):
     """
@@ -49,7 +66,6 @@ def plot_average_rewards(steps: int, rewards: np.ndarray, algorithms: List[Algor
     plt.tight_layout()
     plt.show()
 
-
 def plot_optimal_selections(steps: int, 
                             optimal_selections: np.ndarray, 
                             algorithms: List[Algorithm]):
@@ -71,104 +87,6 @@ def plot_optimal_selections(steps: int,
     plt.ylabel('Porcentaje de Selección del Brazo Óptimo', fontsize=14)
     plt.title('Porcentaje de Selección del Brazo Óptimo vs Pasos de Tiempo', fontsize=16)
     plt.legend(title='Algoritmos')
-    plt.tight_layout()
-    plt.show()
-
-# def plot_arm_statistics(arm_stats: LoQueConsideres,
-#                             algorithms: List[Algorithm], *args):
-#     """
-#     Genera gráficas separadas de Selección de Arms:
-#     Ganancias vs Pérdidas para cada algoritmo.
-#     - :param arm_stats: Lista (de diccionarios) con estadísticas de cada brazo por algoritmo.
-#     - :param algorithms: Lista de instancias de algoritmos comparados.
-#     - :param args: Opcional. Parámetros que consideres
-#     """
-
-def plot_arm_statistics_dep(arm_stats: List[dict], algorithms: List[Algorithm], optimal_arm: int):
-    """
-    Genera gráficas separadas de Selección de Arms:
-    Ganancias vs Pérdidas para cada algoritmo.
-
-    :param arm_stats: Lista (de diccionarios) con estadísticas de cada brazo por algoritmo.
-                      Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
-    :param algorithms: Lista de instancias de algoritmos comparados.
-    :param optimal_arm: Índice del brazo óptimo.
-
-    ADICIONAL:
-    Para generar las estadísticas de cada brazo (arm_stats), puedes considerar varias métricas que te ayudarán a entender el rendimiento de cada brazo. Aquí hay algunos ejemplos de estadísticas que puedes usar:
-
-    - Promedio de Ganancias (average_rewards): El promedio de las recompensas obtenidas por cada brazo.
-    - Número de Selecciones (selection_counts): El número de veces que cada brazo fue seleccionado.
-    - Varianza de las Ganancias (variance_rewards): La varianza de las recompensas obtenidas por cada brazo (opcional).
-    - Recompensa Total (total_rewards): La suma de todas las recompensas obtenidas por cada brazo (opcional).
-    """
-    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
-
-    num_algorithms = len(algorithms)
-    fig, axes = plt.subplots(num_algorithms, 1, figsize=(14, 7 * num_algorithms), sharex=True)
-
-    if num_algorithms == 1:
-        axes = [axes]
-
-    for idx, algo in enumerate(algorithms):
-        ax = axes[idx]
-        stats = arm_stats[idx]
-        average_rewards = stats['average_rewards']
-        selection_counts = stats['selection_counts']
-
-        bars = ax.bar(range(len(average_rewards)), average_rewards, tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)])
-        for i, bar in enumerate(bars):
-            if i == optimal_arm:
-                bar.set_color('g')
-            else:
-                bar.set_color('b')
-
-        ax.set_xlabel('Brazo (Número de Selecciones)', fontsize=14)
-        ax.set_ylabel('Promedio de Ganancias', fontsize=14)
-        ax.set_title(f'Estadísticas de Selección de Brazos para {get_algorithm_label(algo)}', fontsize=16)
-
-    plt.tight_layout()
-    plt.show()
-
-def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], optimal_arm: int):
-    """
-    Genera gráficas de estadísticas de cada brazo.
-
-    :param arm_stats: Lista de diccionarios con estadísticas de cada brazo por algoritmo.
-                      Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
-    :param algorithms: Lista de instancias de algoritmos comparados.
-    :param optimal_arm: Índice del brazo óptimo.
-    """
-    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
-
-    num_algorithms = len(algorithms)
-    fig, axes = plt.subplots(num_algorithms, 1, figsize=(14, 7 * num_algorithms), sharex=True)
-
-    if num_algorithms == 1:
-        axes = [axes]
-
-    for idx, algo in enumerate(algorithms):
-        ax = axes[idx]
-        stats = arm_stats[idx]
-        average_rewards = stats['average_rewards']
-        selection_counts = stats['selection_counts']
-
-        bars = ax.bar(range(len(average_rewards)), average_rewards, tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)])
-        for i, bar in enumerate(bars):
-            if i == optimal_arm:
-                bar.set_color('g')
-            else:
-                bar.set_color('b')
-
-        ax.set_xlabel('Brazo (Número de Selecciones)', fontsize=14)
-        ax.set_ylabel('Promedio de Ganancias', fontsize=14)
-        ax.set_title(f'Estadísticas de Selección de Brazos para {get_algorithm_label(algo)}', fontsize=16)
-
-        # Añadir etiquetas de texto para clarificar el significado de la gráfica
-        for i, bar in enumerate(bars):
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}', ha='center', va='bottom', fontsize=10)
-
     plt.tight_layout()
     plt.show()
 
@@ -198,6 +116,92 @@ def plot_regret(steps: int, regret_accumulated: np.ndarray, algorithms: List[Alg
     plt.tight_layout()
     plt.show()
 
+# def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], optimal_arm: int):
+#     """
+#     Genera gráficas de estadísticas de cada brazo.
+
+#     :param arm_stats: Lista de diccionarios con estadísticas de cada brazo por algoritmo.
+#                       Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
+#     :param algorithms: Lista de instancias de algoritmos comparados.
+#     :param optimal_arm: Índice del brazo óptimo.
+#     """
+#     sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+
+#     num_algorithms = len(algorithms)
+#     fig, axes = plt.subplots(num_algorithms, 1, figsize=(10, 5 * num_algorithms), sharex=True)
+
+#     if num_algorithms == 1:
+#         axes = [axes]
+
+#     for idx, algo in enumerate(algorithms):
+#         ax = axes[idx]
+#         stats = arm_stats[idx]
+#         average_rewards = stats['average_rewards']
+#         selection_counts = stats['selection_counts']
+
+#         bars = ax.bar(range(len(average_rewards)), average_rewards, tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)])
+#         for i, bar in enumerate(bars):
+#             if i == optimal_arm:
+#                 bar.set_color('g')
+#             else:
+#                 bar.set_color('b')
+
+#         ax.set_xlabel('Brazo (Número de Selecciones)', fontsize=14)
+#         ax.set_ylabel('Promedio de Ganancias', fontsize=14)
+#         ax.set_title(f'Estadísticas de Selección de Brazos para {get_algorithm_label(algo)}', fontsize=16)
+
+#         # Añadir etiquetas de texto para clarificar el significado de la gráfica
+#         for i, bar in enumerate(bars):
+#             height = bar.get_height()
+#             ax.text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}', ha='center', va='bottom', fontsize=10)
+
+#     plt.tight_layout()
+#     plt.show()
+
+def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], optimal_arm: int):
+    """
+    Genera gráficas de estadísticas de cada brazo.
+
+    :param arm_stats: Lista de diccionarios con estadísticas de cada brazo por algoritmo.
+                      Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
+    :param algorithms: Lista de instancias de algoritmos comparados.
+    :param optimal_arm: Índice del brazo óptimo.
+    """
+    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+    num_algorithms = len(algorithms)
+    num_rows = (num_algorithms + 1) // 2
+
+    fig, axes = plt.subplots(num_rows, 2, figsize=(20, 5 * num_rows))
+    axes = axes.flatten()
+
+    for idx, algo in enumerate(algorithms):
+        stats = arm_stats[idx]
+        average_rewards = stats['average_rewards']
+        selection_counts = stats['selection_counts']
+
+        bars = axes[idx].bar(range(len(average_rewards)), average_rewards, 
+                             tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)])
+
+        for i, bar in enumerate(bars):
+            if i == optimal_arm:
+                bar.set_color('g')
+            else:
+                bar.set_color('b')
+
+        axes[idx].set_xlabel('Brazo (Número de Selecciones)', fontsize=14)
+        axes[idx].set_ylabel('Promedio de Ganancias', fontsize=14)
+        axes[idx].set_title(f'Estadísticas de Selección de Brazos para {get_algorithm_label(algo)}', fontsize=16)
+
+        for i, bar in enumerate(bars):
+            height = bar.get_height()
+            axes[idx].text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}', ha='center', va='bottom', fontsize=10)
+
+    # Ocultar subplots extra si no se utilizan
+    for j in range(len(algorithms), len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.tight_layout()
+    plt.show()
 
 def calculate_expected_regret(steps: int, constant: float) -> np.ndarray:
     """
@@ -208,3 +212,52 @@ def calculate_expected_regret(steps: int, constant: float) -> np.ndarray:
     :return: Arreglo con el arrepentimiento esperado para cada paso de tiempo.
     """
     return constant * np.log(np.arange(1, steps + 1))
+
+# def plot_arm_statistics_three(arm_stats: List[dict], algorithms: List, optimal_arm: int):
+#     """
+#     Genera gráficas de estadísticas de cada brazo, organizadas en una sola fila.
+
+#     :param arm_stats: Lista de diccionarios con estadísticas de cada brazo por algoritmo.
+#                       Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
+#     :param algorithms: Lista de instancias o nombres de los algoritmos comparados.
+#     :param optimal_arm: Índice del brazo óptimo.
+#     """
+#     sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
+
+#     num_algorithms = len(algorithms)
+#     fig, axes = plt.subplots(1, num_algorithms, figsize=(20 * num_algorithms, 15), sharey=True)
+
+#     # Si solo hay un algoritmo, convertimos axes en lista para iterar igual que en el bucle
+#     if num_algorithms == 1:
+#         axes = [axes]
+
+#     for idx, algo in enumerate(algorithms):
+#         ax = axes[idx]
+#         stats = arm_stats[idx]
+#         average_rewards = stats['average_rewards']
+#         selection_counts = stats['selection_counts']
+
+#         bars = ax.bar(
+#             range(len(average_rewards)),
+#             average_rewards,
+#             tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)]
+#         )
+#         for i, bar in enumerate(bars):
+#             if i == optimal_arm:
+#                 bar.set_color('g')
+#             else:
+#                 bar.set_color('b')
+
+#         ax.set_xlabel('Brazo (Número de Selecciones)', fontsize=14)
+#         ax.set_ylabel('Promedio de Ganancias', fontsize=14)
+#         ax.set_title(f'Estadísticas para {get_algorithm_label(algo)}', fontsize=16)
+
+#         # Añadir etiquetas de texto sobre cada barra
+#         for bar in bars:
+#             height = bar.get_height()
+#             ax.text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}',
+#                     ha='center', va='bottom', fontsize=16)
+
+#     plt.tight_layout()
+#     plt.show()
+
