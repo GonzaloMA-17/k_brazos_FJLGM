@@ -167,7 +167,7 @@ def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], opti
     :param arm_stats: Lista de diccionarios con estadísticas de cada brazo por algoritmo.
                       Cada diccionario debe contener 'average_rewards' y 'selection_counts'.
     :param algorithms: Lista de instancias de algoritmos comparados.
-    :param optimal_arm: Índice del brazo óptimo.
+    :param optimal_arm: Índice del brazo óptimo (0-based).
     """
     sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
     num_algorithms = len(algorithms)
@@ -181,9 +181,14 @@ def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], opti
         average_rewards = stats['average_rewards']
         selection_counts = stats['selection_counts']
 
-        bars = axes[idx].bar(range(len(average_rewards)), average_rewards, 
-                             tick_label=[f"{i}\n({count})" for i, count in enumerate(selection_counts)])
+        # Ajuste para mostrar los brazos empezando en 1 (i+1)
+        bars = axes[idx].bar(
+            range(len(average_rewards)), 
+            average_rewards,
+            tick_label=[f"{i+1}\n({count})" for i, count in enumerate(selection_counts)]
+        )
 
+        # Colorear de verde el brazo óptimo (si optimal_arm es 0-based, comparar con i directamente)
         for i, bar in enumerate(bars):
             if i == optimal_arm:
                 bar.set_color('g')
@@ -194,9 +199,17 @@ def plot_arm_statistics(arm_stats: List[dict], algorithms: List[Algorithm], opti
         axes[idx].set_ylabel('Promedio de Ganancias', fontsize=14)
         axes[idx].set_title(f'Estadísticas de Selección de Brazos para {get_algorithm_label(algo)}', fontsize=16)
 
+        # Mostrar la ganancia promedio encima de cada barra
         for i, bar in enumerate(bars):
             height = bar.get_height()
-            axes[idx].text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}', ha='center', va='bottom', fontsize=10)
+            axes[idx].text(
+                bar.get_x() + bar.get_width() / 2.0,
+                height,
+                f'{height:.2f}',
+                ha='center',
+                va='bottom',
+                fontsize=10
+            )
 
     # Ocultar subplots extra si no se utilizan
     for j in range(len(algorithms), len(axes)):
