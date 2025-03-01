@@ -53,7 +53,7 @@ class ArmBernoulli(Arm):
 
         "Normas:"
         assert k > 0, "El número de brazos k debe ser mayor que 0."
-        assert 0 <= p_min < p_max <= 1, "El valor de p_min debe ser menor que p_max."
+        assert p_min < p_max, "El valor de p_min debe ser menor que p_max."
 
         # Generar k valores únicos de p
         p_values = set()

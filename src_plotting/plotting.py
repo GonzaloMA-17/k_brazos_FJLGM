@@ -36,6 +36,8 @@ def get_algorithm_label(algo: Algorithm) -> str:
         label += f" (epsilon={algo.epsilon})"
     elif isinstance(algo, Softmax):
         label += f" (tau={algo.tau})"
+    elif isinstance(algo, GradientPreference):
+        label += f" (alpha={algo.alpha})"
         
     # elif isinstance(algo, OtroAlgoritmo):
     #     label += f" (parametro={algo.parametro})"

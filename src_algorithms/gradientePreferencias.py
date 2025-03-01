@@ -2,26 +2,23 @@ import numpy as np
 from src_algorithms.algorithm import Algorithm
 
 class GradientPreference(Algorithm):
-    def __init__(self, k: int, alpha: float = 0.1, use_baseline: bool = True):
+
+    def __init__(self, k: int, alpha: float = 0.1):
         """
         Inicializa el algoritmo de gradiente de preferencias.
 
         :param k: Número de brazos.
-        :param alpha: Tasa de aprendizaje para actualizar las preferencias.
-        :param use_baseline: Indica si se utiliza un baseline (recompensa promedio) en la actualización.
-        :raises ValueError: Si alpha no es mayor que 0.
-        """
-        if alpha <= 0:
-            raise ValueError("El parámetro alpha debe ser mayor que 0.")
+        :param alpha: Tasa de aprendizaje para actualizar las preferencias (H).
 
+        """
+        assert 0 < alpha, "El parámetro alpha debe ser mayor que 0."
+        
         super().__init__(k)
-        # Inicializa las preferencias a cero para todos los brazos
-        self.preferences = np.zeros(k)
-        self.alpha = alpha
-        self.use_baseline = use_baseline
-        # Inicializa el baseline (recompensa promedio) y el contador de pasos
-        self.avg_reward = 0.0
-        self.time = 0
+        
+        self.preferences = np.zeros(k) # Inicializa las preferencias Ht(a)
+        self.alpha = alpha # Tasa de aprendizaje
+        self.probabilities = np.ones(k) / k # Probabilidad de seleccionar cada brazo
+        """Las probabilidades deben comenzar con una distribución uniforme."""
 
     def select_arm(self) -> int:
         """
@@ -34,9 +31,9 @@ class GradientPreference(Algorithm):
         :return: índice del brazo seleccionado.
         """
         exp_preferences = np.exp(self.preferences)
-        self.probabilities = exp_preferences / np.sum(exp_preferences)
-        chosen_arm = np.random.choice(self.k, p=self.probabilities)
-        return chosen_arm
+        self.probabilities = exp_preferences / np.sum(exp_preferences)  # Cálculo de πt(a)
+        
+        return np.random.choice(self.k, p=self.probabilities) # Devuelve el brazo basado en πt(a)
 
     def update(self, chosen_arm: int, reward: float) -> None:
         """
@@ -44,29 +41,37 @@ class GradientPreference(Algorithm):
         
         La fórmula de actualización es:
         
-            H(a) <- H(a) + alpha * (reward - baseline) * (I(a == chosen_arm) - P(a))
+            H(a) <- H(a) + alpha * (reward - recompensa promedio) * (I(a == chosen_arm) - P(a))
         
         donde:
           - H(a) es la preferencia del brazo a.
           - alpha es la tasa de aprendizaje.
           - reward es la recompensa obtenida.
-          - baseline es la recompensa promedio (si se usa).
+          - recompensa promedio.
           - I(a == chosen_arm) es 1 si a es el brazo seleccionado y 0 en caso contrario.
           - P(a) es la probabilidad de seleccionar el brazo a calculada en select_arm().
         
         :param chosen_arm: El índice del brazo que fue seleccionado.
         :param reward: La recompensa obtenida al seleccionar ese brazo.
+
         """
-        self.time += 1
+        average_reward = np.mean(self.values)  # R̄t (recompensa promedio estimada)
 
-        # Actualiza el baseline (recompensa promedio) si se está usando
-        if self.use_baseline:
-            self.avg_reward += (reward - self.avg_reward) / self.time
-            baseline = self.avg_reward
-        else:
-            baseline = 0
-
-        # Actualiza las preferencias para cada brazo
+        # Actualización de las preferencias usando el Gradiente de Preferencias
         for a in range(self.k):
-            indicator = 1 if a == chosen_arm else 0
-            self.preferences[a] += self.alpha * (reward - baseline) * (indicator - self.probabilities[a])
+            if a == chosen_arm:
+                self.preferences[a] += self.alpha * (reward - average_reward) * (1 - self.probabilities[a])
+            else:
+                self.preferences[a] -= self.alpha * (reward - average_reward) * self.probabilities[a]
+
+        """En Gradiente de Preferencias, no debemos actualizar las recompensas de la forma estándar, 
+        ya que el algoritmo solo trabaja con preferencias. Elimina la línea de super().update(chosen_arm, reward)."""
+
+    def reset(self):
+        """
+        Reinicia el estado del algoritmo, incluidos los parámetros Ht(a) y las probabilidades.
+        """
+        self.counts = np.zeros(self.k, dtype=int)
+        self.values = np.zeros(self.k, dtype=float)
+        self.preferences = np.zeros(self.k)
+        self.probabilities = np.ones(self.k) / self.k

@@ -26,8 +26,9 @@ class Softmax(Algorithm):
                     mientras que valores altos favorecen la exploración.
         :raises ValueError: Si tau no es mayor que 0.
         """
-        if tau <= 0:
-            raise ValueError("El parámetro tau debe ser mayor que 0.")
+        # if tau <= 0:
+        #     raise ValueError("El parámetro tau debe ser mayor que 0.")
+        assert 0 < tau, "El parámetro tau debe ser mayor que 0."
         
         super().__init__(k)
         self.tau = tau
@@ -57,3 +58,9 @@ class Softmax(Algorithm):
         
         chosen_arm = np.random.choice(self.k, p=probab)
         return chosen_arm
+    
+    def update(self, chosen_arm: int, reward: float) -> None:
+        """
+        Actualiza la estimación de recompensa para el brazo seleccionado.
+        """
+        super().update(chosen_arm, reward)  # Usa la actualización de la clase abstracta Algorithm
