@@ -118,8 +118,8 @@ def plot_regret(steps: int, regret_accumulated: np.ndarray, algorithms: List[Alg
         plt.plot(range(steps), expected_regret, label='Arrepentimiento Esperado', linestyle='--', color='r', linewidth=2)
 
     plt.xlabel('Pasos de Tiempo', fontsize=14)
-    plt.ylabel('Rechazo Acumulado', fontsize=14)
-    plt.title('Rechazo Acumulado vs Pasos de Tiempo', fontsize=16)
+    plt.ylabel('Regret Acumulado', fontsize=14)
+    plt.title('Regret Acumulado vs Pasos de Tiempo', fontsize=16)
     plt.legend(title='Algoritmos')
     plt.tight_layout()
     plt.show()
