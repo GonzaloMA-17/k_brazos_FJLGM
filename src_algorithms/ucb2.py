@@ -1,3 +1,17 @@
+"""
+Module: src_algorithms/ucb2.py
+Description: Implementación del algoritmo upper confidence bound 2 para el problema de los k-brazos.
+
+Authors: Gonzalo Marcos Andres and Francisco José López Fernández
+Email: gonzalo.marcosa@um.es and franciscojose.lopezf@um.es
+Date: 2025/02/25
+
+This software is licensed under the GNU General Public License v3.0 (GPL-3.0),
+with the additional restriction that it may not be used for commercial purposes.
+
+For more details about GPL-3.0: https://www.gnu.org/licenses/gpl-3.0.html
+"""
+
 import math
 import random
 import numpy as np

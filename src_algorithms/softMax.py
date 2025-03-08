@@ -1,5 +1,5 @@
 """
-Module: algorithms/softmax.py
+Module: src_algorithms/softmax.py
 Description: Implementación del algoritmo softmax para el problema de los k-brazos.
 
 Authors: Gonzalo Marcos Andres and Francisco José López Fernández
