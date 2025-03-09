@@ -39,16 +39,13 @@ El repositorio está organizado de la siguiente manera:
 Para instalar y utilizar este proyecto, sigue los siguientes pasos:
 1. Clona el repositorio:
     ```bash
-    git clone git clone https://github.com/GonzaloMA-17/k_brazos_FJLGM.git
+    git clone https://github.com/GonzaloMA-17/k_brazos_FJLGM.git
     ```
 2. Navega al directorio del proyecto:
     ```bash
     cd RL-Bandido
     ```
-3. Instala las dependencias necesarias:
-    ```bash
-    pip install -r requirements.txt
-    ```
+3. Instala las dependencias necesarias: Las dependencias las incorpora collab por defecto, son las mencionadas más adelante.
 4. Ejecuta los scripts o notebooks según sea necesario.
 
 ## Tecnologías Utilizadas 
